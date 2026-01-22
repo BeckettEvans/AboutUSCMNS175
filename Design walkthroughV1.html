@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemainus Chamber - Design Document</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Roboto:wght@300;400;500&display=swap');
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // Inline minimal Icon components since we can't import from lucide-react directly in browser
+        const ChevronLeft = ({ size = 24, className = "" }) => (
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width={size} 
+                height={size} 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className={className}
+            >
+                <path d="m15 18-6-6 6-6"/>
+            </svg>
+        );
+
+        const ChevronRight = ({ size = 24, className = "" }) => (
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width={size} 
+                height={size} 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className={className}
+            >
+                <path d="m9 18 6-6-6-6"/>
+            </svg>
+        );
+
+        const Download = ({ size = 24, className = "" }) => (
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width={size} 
+                height={size} 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className={className}
+            >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" x2="12" y1="15" y2="3"/>
+            </svg>
+        );
+
+        const DesignDoc = () => {
+            const [currentPage, setCurrentPage] = useState(0);
+
+            const totalPages = 10;
+
+            const nextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1));
+            const prevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 0));
+
+            const renderPage = (pageNum) => {
+                switch(pageNum) {
+                case 0:
+                    return (
+                    <div className="h-full flex flex-col justify-center items-center bg-gradient-to-br from-teal-700 to-teal-900 text-white p-12">
+                        <div className="text-center space-y-6">
+                        <h1 className="text-5xl font-bold mb-4">About Us Page</h1>
+                        <h2 className="text-3xl font-semibold">Design Document & Mockups</h2>
+                        <div className="mt-8 space-y-2">
+                            <p className="text-2xl">Chemainus & District</p>
+                            <p className="text-2xl">Chamber of Commerce</p>
+                        </div>
+                        <div className="mt-12 text-teal-200">
+                            <p className="text-lg">Design Proposal & Visual Specifications</p>
+                            <p className="text-sm mt-2">January 2026</p>
+                        </div>
+                        </div>
+                    </div>
+                    );
+                
+                case 1:
+                    return (
+                    <div className="h-full bg-white p-12 overflow-y-auto">
+                        <h2 className="text-3xl font-bold text-teal-800 mb-8">Table of Contents</h2>
+                        <div className="space-y-4 text-lg">
+                        <div className="flex justify-between border-b border-gray-300 pb-2">
+                            <span>1. Brand Identity & Color Palette</span>
+                            <span className="text-gray-600">03</span>
+                        </div>
+                        <div className="flex justify-between border-b border-gray-300 pb-2">
+                            <span>2. Typography System</span>
+                            <span className="text-gray-600">04</span>
+                        </div>
+                        <div className="flex justify-between border-b border-gray-300 pb-2">
+                            <span>3. Hero Section Mockup</span>
+                            <span className="text-gray-600">05</span>
+                        </div>
+                        <div className="flex justify-between border-b border-gray-300 pb-2">
+                            <span>4. Introduction Section</span>
+                            <span className="text-gray-600">06</span>
+                        </div>
+                        <div className="flex justify-between border-b border-gray-300 pb-2">
+                            <span>5. Timeline Design</span>
+                            <span className="text-gray-600">07</span>
+                        </div>
+                        <div className="flex justify-between border-b border-gray-300 pb-2">
+                            <span>6. Mission & Values Section</span>
+                            <span className="text-gray-600">08</span>
+                        </div>
+                        <div className="flex justify-between border-b border-gray-300 pb-2">
+                            <span>7. Markets & CTA Sections</span>
+                            <span className="text-gray-600">09</span>
+                        </div>
+                        <div className="flex justify-between border-b border-gray-300 pb-2">
+                            <span>8. Component Specifications</span>
+                            <span className="text-gray-600">10</span>
+                        </div>
+                        </div>
+                    </div>
+                    );
+
+                case 2:
+                    return (
+                    <div className="h-full bg-white p-12 overflow-y-auto">
+                        <h2 className="text-3xl font-bold text-teal-800 mb-6">Brand Identity & Color Palette</h2>
+                        
+                        <div className="grid grid-cols-3 gap-6 mb-8">
+                        <div className="space-y-3">
+                            <div className="h-32 bg-teal-700 rounded-lg shadow-lg"></div>
+                            <div className="text-center">
+                            <p className="font-bold text-gray-800">Primary Teal</p>
+                            <p className="text-sm text-gray-600">#008080</p>
+                            <p className="text-xs text-gray-500">Buttons, headings, brand</p>
+                            </div>
+                        </div>
+                        
+                        <div className="space-y-3">
+                            <div className="h-32 bg-teal-400 rounded-lg shadow-lg"></div>
+                            <div className="text-center">
+                            <p className="font-bold text-gray-800">Seafoam Accent</p>
+                            <p className="text-sm text-gray-600">#4db6ac</p>
+                            <p className="text-xs text-gray-500">Dividers, icons, highlights</p>
+                            </div>
+                        </div>
+                        
+                        <div className="space-y-3">
+                            <div className="h-32 bg-yellow-400 rounded-lg shadow-lg"></div>
+                            <div className="text-center">
+                            <p className="font-bold text-gray-800">Gold Accent</p>
+                            <p className="text-sm text-gray-600">#ffd700</p>
+                            <p className="text-xs text-gray-500">Premium highlights</p>
+                            </div>
+                        </div>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-6">
+                        <div className="space-y-3">
+                            <div className="h-32 bg-gray-100 rounded-lg shadow-lg border-2 border-gray-300"></div>
+                            <div className="text-center">
+                            <p className="font-bold text-gray-800">Light Background</p>
+                            <p className="text-sm text-gray-600">#f4f7f6</p>
+                            <p className="text-xs text-gray-500">Alternating sections</p>
+                            </div>
+                        </div>
+                        
+                        <div className="space-y-3">
+                            <div className="h-32 bg-white rounded-lg shadow-lg border-2 border-gray-300"></div>
+                            <div className="text-center">
+                            <p className="font-bold text-gray-800">White</p>
+                            <p className="text-sm text-gray-600">#ffffff</p>
+                            <p className="text-xs text-gray-500">Primary content</p>
+                            </div>
+                        </div>
+                        
+                        <div className="space-y-3">
+                            <div className="h-32 bg-gray-900 rounded-lg shadow-lg"></div>
+                            <div className="text-center">
+                            <p className="font-bold text-gray-800">Dark Background</p>
+                            <p className="text-sm text-gray-600">#0f1c22</p>
+                            <p className="text-xs text-gray-500">Footer, dark sections</p>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    );
+
+                case 3:
+                    return (
+                    <div className="h-full bg-white p-12 overflow-y-auto">
+                        <h2 className="text-3xl font-bold text-teal-800 mb-6">Typography System</h2>
+                        
+                        <div className="space-y-8">
+                        <div className="border-l-4 border-teal-600 pl-6">
+                            <p className="text-sm text-gray-600 mb-2">PRIMARY FONT - HEADINGS</p>
+                            <h3 className="text-5xl font-bold text-gray-900">Montserrat</h3>
+                            <p className="text-gray-600 mt-2">Weights: 400, 600, 700, 800</p>
+                        </div>
+
+                        <div className="border-l-4 border-teal-400 pl-6">
+                            <p className="text-sm text-gray-600 mb-2">SECONDARY FONT - BODY TEXT</p>
+                            <h3 className="text-4xl font-normal text-gray-900">Roboto</h3>
+                            <p className="text-gray-600 mt-2">Weights: 300, 400, 500</p>
+                        </div>
+
+                        <div className="bg-gray-50 p-6 rounded-lg">
+                            <p className="text-sm font-semibold text-teal-800 mb-4">TYPE SCALE</p>
+                            <div className="space-y-3">
+                            <div className="flex items-baseline gap-4">
+                                <span className="text-6xl font-bold text-gray-900 w-16">H1</span>
+                                <span className="text-gray-600">48-64px • Hero headlines</span>
+                            </div>
+                            <div className="flex items-baseline gap-4">
+                                <span className="text-4xl font-bold text-gray-900 w-16">H2</span>
+                                <span className="text-gray-600">36-42px • Section headings</span>
+                            </div>
+                            <div className="flex items-baseline gap-4">
+                                <span className="text-2xl font-bold text-gray-900 w-16">H3</span>
+                                <span className="text-gray-600">24-32px • Subheadings</span>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    );
+
+                case 4:
+                    return (
+                    <div className="h-full bg-white p-12 overflow-y-auto">
+                        <h2 className="text-3xl font-bold text-teal-800 mb-6">Hero Section Mockup</h2>
+                        
+                        <div className="border-2 border-gray-300 rounded-lg overflow-hidden shadow-xl">
+                        <div className="bg-gray-900 bg-opacity-80 px-8 py-4 flex justify-between items-center">
+                            <span className="text-white font-bold text-lg">Chemainus Chamber</span>
+                            <div className="flex gap-6 text-white text-sm">
+                            <span>Home</span>
+                            <span className="text-teal-400">About Us</span>
+                            <span>Membership</span>
+                            </div>
+                        </div>
+
+                        <div className="relative bg-gradient-to-br from-teal-800 to-teal-900 h-96 flex items-center justify-center">
+                            <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+                            <div className="relative text-center text-white px-8 space-y-6">
+                            <h1 className="text-4xl font-bold leading-tight">
+                                The Little Town That Did<br/>
+                                Where Art Builds Community
+                            </h1>
+                            <p className="text-xl text-gray-200">
+                                Discover how Chemainus transformed crisis into renaissance
+                            </p>
+                            <button className="bg-teal-600 text-white px-8 py-4 rounded-full font-semibold">
+                                Explore Our Story
+                            </button>
+                            </div>
+                        </div>
+                        </div>
+
+                        <div className="mt-6 bg-gray-50 p-4 rounded-lg">
+                        <p className="text-sm font-semibold text-teal-800 mb-2">SPECIFICATIONS:</p>
+                        <ul className="text-sm text-gray-700 space-y-1">
+                            <li>• Full viewport height with video background</li>
+                            <li>• Gradient overlay: Deep teal to black, 55% opacity</li>
+                            <li>• Fixed navigation with semi-transparent background</li>
+                            <li>• Animated scroll indicator</li>
+                        </ul>
+                        </div>
+                    </div>
+                    );
+
+                case 5:
+                    return (
+                    <div className="h-full bg-white p-12 overflow-y-auto">
+                        <h2 className="text-3xl font-bold text-teal-800 mb-6">Timeline Section Design</h2>
+                        
+                        <div className="border-2 border-gray-300 rounded-lg p-8 bg-gray-50">
+                        <div className="text-center mb-8">
+                            <p className="text-teal-400 text-sm font-semibold">A DECADE OF CHANGE</p>
+                            <h2 className="text-3xl font-bold text-teal-800 mt-2">Our Journey: From Crisis to Canvas</h2>
+                        </div>
+
+                        <div className="relative ml-8">
+                            <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-teal-400"></div>
+
+                            {['1970s', '1980', '1982', '1983', '1990s'].map((year, idx) => (
+                            <div key={idx} className="relative flex items-start gap-6 mb-8">
+                                <div className="absolute -left-10 w-4 h-4 bg-teal-700 rounded-full border-4 border-white"></div>
+                                <div>
+                                <span className="inline-block bg-teal-600 text-white px-3 py-1 rounded-full text-sm font-bold mb-2">
+                                    {year}
+                                </span>
+                                <h3 className="text-xl font-bold text-teal-700">Milestone Title</h3>
+                                <p className="text-gray-600 text-sm">Event description...</p>
+                                </div>
+                            </div>
+                            ))}
+                        </div>
+                        </div>
+                    </div>
+                    );
+
+                case 6:
+                    return (
+                    <div className="h-full bg-white p-12 overflow-y-auto">
+                        <h2 className="text-3xl font-bold text-teal-800 mb-6">Mission & Values Section</h2>
+                        
+                        <div className="bg-gradient-to-br from-gray-900 to-teal-900 p-8 rounded-lg">
+                        <div className="grid grid-cols-2 gap-6 mb-8">
+                            <div className="bg-white bg-opacity-10 backdrop-blur-md border border-white border-opacity-20 rounded-xl p-6 text-white">
+                            <div className="text-3xl mb-3">🤝</div>
+                            <h3 className="text-xl font-bold mb-2">Our Mission</h3>
+                            <p className="text-sm text-gray-200">
+                                To champion Chemainus as a thriving community...
+                            </p>
+                            </div>
+
+                            <div className="bg-white bg-opacity-10 backdrop-blur-md border border-white border-opacity-20 rounded-xl p-6 text-white">
+                            <div className="text-3xl mb-3">🌅</div>
+                            <h3 className="text-xl font-bold mb-2">Who We Are</h3>
+                            <p className="text-sm text-gray-200">
+                                The organizational catalyst...
+                            </p>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-5 gap-4">
+                            {['Authenticity', 'Resilience', 'Expression', 'Community', 'Collaboration'].map((val, i) => (
+                            <div key={i} className="bg-white bg-opacity-10 rounded-lg p-4 text-center text-white">
+                                <div className="text-2xl mb-2">✓</div>
+                                <h4 className="text-sm font-semibold">{val}</h4>
+                            </div>
+                            ))}
+                        </div>
+                        </div>
+                    </div>
+                    );
+
+                case 7:
+                    return (
+                    <div className="h-full bg-white p-12 overflow-y-auto">
+                        <h2 className="text-3xl font-bold text-teal-800 mb-6">Markets & CTA Sections</h2>
+                        
+                        <div className="border-2 border-gray-300 rounded-lg p-6 mb-6">
+                        <h3 className="text-center text-2xl font-bold text-teal-800 mb-6">Three-Column Markets</h3>
+                        <div className="grid grid-cols-3 gap-4">
+                            <div className="bg-gray-50 rounded-lg p-4 text-center">
+                            <div className="text-3xl mb-2">💼</div>
+                            <h4 className="font-bold text-teal-700">Businesses</h4>
+                            </div>
+                            <div className="bg-teal-700 rounded-lg p-4 text-center text-white">
+                            <div className="text-3xl mb-2">🗺️</div>
+                            <h4 className="font-bold">Visitors</h4>
+                            </div>
+                            <div className="bg-gray-50 rounded-lg p-4 text-center">
+                            <div className="text-3xl mb-2">👥</div>
+                            <h4 className="font-bold text-teal-700">Residents</h4>
+                            </div>
+                        </div>
+                        </div>
+
+                        <div className="border-2 border-gray-300 rounded-lg p-6 bg-gray-50">
+                        <h3 className="text-center text-2xl font-bold mb-4">Join Our Community</h3>
+                        <div className="grid grid-cols-3 gap-4">
+                            <button className="bg-teal-600 text-white px-6 py-3 rounded-full font-semibold">
+                            Become a Member
+                            </button>
+                            <button className="border-2 border-teal-600 text-teal-600 px-6 py-3 rounded-full font-semibold">
+                            Plan Your Visit
+                            </button>
+                            <button className="border-2 border-teal-600 text-teal-600 px-6 py-3 rounded-full font-semibold">
+                            Discover Events
+                            </button>
+                        </div>
+                        </div>
+                    </div>
+                    );
+
+                case 8:
+                    return (
+                    <div className="h-full bg-white p-12 overflow-y-auto">
+                        <h2 className="text-3xl font-bold text-teal-800 mb-6">Component Specifications</h2>
+                        
+                        <div className="space-y-6">
+                        <div className="border-2 border-gray-300 rounded-lg p-6">
+                            <h3 className="text-lg font-bold text-teal-700 mb-4">Button Styles</h3>
+                            <div className="space-y-4">
+                            <div>
+                                <button className="bg-teal-600 text-white px-8 py-3 rounded-full font-semibold">
+                                Primary
+                                </button>
+                                <p className="text-sm text-gray-600 mt-2">Teal bg, white text, 50px radius</p>
+                            </div>
+                            <div>
+                                <button className="border-2 border-teal-600 text-teal-600 px-8 py-3 rounded-full font-semibold">
+                                Secondary
+                                </button>
+                                <p className="text-sm text-gray-600 mt-2">White bg, teal border</p>
+                            </div>
+                            </div>
+                        </div>
+
+                        <div className="border-2 border-gray-300 rounded-lg p-6">
+                            <h3 className="text-lg font-bold text-teal-700 mb-4">Spacing</h3>
+                            <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                                <span>Section Padding:</span>
+                                <span className="text-gray-600">5rem top/bottom</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Grid Gap:</span>
+                                <span className="text-gray-600">2-4rem</span>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    );
+
+                case 9:
+                    return (
+                    <div className="h-full bg-gradient-to-br from-teal-700 to-teal-900 text-white p-12 flex flex-col justify-center items-center">
+                        <h2 className="text-4xl font-bold mb-8">Design Document Complete</h2>
+                        <p className="text-xl mb-6 text-center max-w-2xl">
+                        This design specification provides a comprehensive guide for implementing the Chemainus Chamber of Commerce "About Us" page.
+                        </p>
+                        <div className="text-center space-y-3">
+                        <p className="text-teal-200">Next Steps:</p>
+                        <ul className="text-left space-y-2 text-lg">
+                            <li>✓ Review all section mockups</li>
+                            <li>✓ Implement responsive layouts</li>
+                            <li>✓ Test accessibility compliance</li>
+                            <li>✓ Optimize images and assets</li>
+                        </ul>
+                        </div>
+                    </div>
+                    );
+
+                default:
+                    return <div>Page not found</div>;
+                }
+            };
+
+            return (
+                <div className="w-full h-screen bg-gray-100 flex flex-col">
+                <div className="bg-teal-800 text-white p-4 flex justify-between items-center">
+                    <h1 className="text-xl font-bold">Chemainus Chamber - Design Document</h1>
+                    <div className="flex items-center gap-4">
+                    <span className="text-sm">Page {currentPage + 1} of {totalPages}</span>
+                    <button className="flex items-center gap-2 bg-teal-600 px-4 py-2 rounded hover:bg-teal-700">
+                        <Download size={16} />
+                        <span className="text-sm">Export PDF</span>
+                    </button>
+                    </div>
+                </div>
+
+                <div className="flex-1 bg-white shadow-2xl m-8 rounded-lg overflow-hidden">
+                    {renderPage(currentPage)}
+                </div>
+
+                <div className="bg-white border-t p-4 flex justify-between items-center">
+                    <button
+                    onClick={prevPage}
+                    disabled={currentPage === 0}
+                    className="flex items-center gap-2 px-6 py-2 bg-teal-600 text-white rounded disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    >
+                    <ChevronLeft size={20} />
+                    Previous
+                    </button>
+
+                    <div className="flex gap-2">
+                    {Array.from({ length: totalPages }).map((_, idx) => (
+                        <button
+                        key={idx}
+                        onClick={() => setCurrentPage(idx)}
+                        className={`w-3 h-3 rounded-full ${
+                            idx === currentPage ? 'bg-teal-600' : 'bg-gray-300'
+                        }`}
+                        />
+                    ))}
+                    </div>
+
+                    <button
+                    onClick={nextPage}
+                    disabled={currentPage === totalPages - 1}
+                    className="flex items-center gap-2 px-6 py-2 bg-teal-600 text-white rounded disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    >
+                    Next
+                    <ChevronRight size={20} />
+                    </button>
+                </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<DesignDoc />);
+    </script>
+</body>
+</html>
