@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemainus Design & Research Presentation</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Fonts -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Roboto:wght@300;400;500;700&display=swap');
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        h1, h2, h3, h4, k5, h6 {
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #008080; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #006666; 
+        }
+        
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Anchor offset for fixed header */
+        section {
+            scroll-margin-top: 100px;
+        }
+        
+        /* Citation Highlight Animation */
+        @keyframes highlight-pulse {
+            0% { 
+                background-color: rgba(255, 215, 0, 0); 
+                transform: translateX(0);
+            }
+            10% { 
+                background-color: rgba(255, 215, 0, 0.3); 
+                transform: translateX(10px);
+                border-radius: 8px;
+                padding-left: 10px;
+                margin-left: -10px; /* Counteract padding to keep alignment */
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+            }
+            80% { 
+                background-color: rgba(255, 215, 0, 0.3); 
+                transform: translateX(10px);
+                border-radius: 8px;
+                padding-left: 10px;
+                margin-left: -10px;
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+            }
+            100% { 
+                background-color: rgba(255, 215, 0, 0); 
+                transform: translateX(0);
+                border-radius: 0;
+                padding-left: 0;
+                margin-left: 0;
+                box-shadow: none;
+            }
+        }
+
+        li[id^="ref-"] {
+            scroll-margin-top: 150px; /* Offset for fixed header + breathing room */
+            transition: all 0.3s ease;
+        }
+
+        li[id^="ref-"]:target {
+            animation: highlight-pulse 2.5s ease-in-out forwards;
+        }
+    </style>
+     <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        teal: {
+                            DEFAULT: '#008080',
+                            50: '#e0f2f1',
+                            100: '#b2dfdb',
+                            600: '#00897b',
+                            700: '#00796b',
+                            800: '#00695c',
+                            900: '#004d40',
+                        },
+                        seafoam: '#4db6ac',
+                        gold: '#ffd700',
+                        dark: '#0f1c22',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const NavLink = ({ sectionId, label, activeSection }) => (
+            <button 
+                onClick={() => document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' })}
+                className={`py-4 px-6 text-sm font-bold uppercase tracking-wider transition-colors duration-300 border-b-4 ${
+                    activeSection === sectionId 
+                    ? 'border-gold text-white' 
+                    : 'border-transparent text-teal-100 hover:text-white hover:border-seafoam'
+                }`}
+            >
+                {label}
+            </button>
+        );
+
+        const SectionHeader = ({ title, subtitle }) => (
+            <div className="mb-12 border-l-8 border-teal pl-6 py-2">
+                <h3 className="text-seafoam font-bold tracking-[0.2em] uppercase text-sm mb-2">{subtitle}</h3>
+                <h2 className="text-4xl font-bold text-gray-900">{title}</h2>
+            </div>
+        );
+
+        const Card = ({ title, children, className = "" }) => (
+            <div className={`bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow duration-300 border-t-4 border-teal ${className}`}>
+                {title && <h3 className="text-xl font-bold text-teal mb-4">{title}</h3>}
+                <div className="text-gray-600 leading-relaxed text-sm">
+                    {children}
+                </div>
+            </div>
+        );
+
+        const SpecItem = ({ label, value }) => (
+            <div className="flex justify-between items-center py-3 border-b border-gray-100 last:border-0">
+                <span className="font-semibold text-gray-700">{label}</span>
+                <span className="text-teal font-medium text-right">{value}</span>
+            </div>
+        );
+
+        const CitationLink = ({ id, children }) => (
+            <a href={`#${id}`} className="text-teal-600 hover:text-teal-800 font-medium hover:underline transition-colors" title="View Source">
+                {children}
+            </a>
+        );
+
+        const StrategyNote = ({ title, children }) => (
+            <div className="my-6 p-4 bg-indigo-50 border-l-4 border-indigo-500 rounded-r-md text-sm text-indigo-900 shadow-sm">
+                <div className="flex items-center gap-2 mb-2 font-bold uppercase tracking-wider text-xs text-indigo-600">
+                    <span className="text-lg">💡</span> INDUSTRY RATIONALE
+                </div>
+                {title && <strong className="block mb-1 text-indigo-800">{title}</strong>}
+                <div className="leading-relaxed opacity-90">{children}</div>
+            </div>
+        );
+
+        const App = () => {
+            const [activeSection, setActiveSection] = useState('hero');
+            const [isPreviewLoading, setIsPreviewLoading] = useState(true);
+
+            useEffect(() => {
+                const handleMessage = (event) => {
+                    if (event.data && event.data.type === 'HERO_VIDEO_PLAYING') {
+                        setIsPreviewLoading(false);
+                    }
+                };
+                window.addEventListener('message', handleMessage);
+                
+                // Safety fallback: If message never comes (e.g. video error), reveal after 8s
+                const fallbackTimer = setTimeout(() => {
+                    setIsPreviewLoading(false);
+                }, 8000);
+
+                return () => {
+                    window.removeEventListener('message', handleMessage);
+                    clearTimeout(fallbackTimer);
+                };
+            }, []);
+
+            // Scroll spy to update active nav link
+            useEffect(() => {
+                const handleScroll = () => {
+                    const sections = ['hero', 'research', 'content', 'proposal', 'preview', 'bibliography'];
+                    for (const section of sections) {
+                        const element = document.getElementById(section);
+                        if (element) {
+                            const rect = element.getBoundingClientRect();
+                            if (rect.top <= 200 && rect.bottom >= 200) {
+                                setActiveSection(section);
+                                break;
+                            }
+                        }
+                    }
+                };
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            return (
+                <div>
+                    {/* Navigation */}
+                    <nav className="fixed top-0 left-0 right-0 bg-teal-900 shadow-xl z-50 backdrop-blur-md bg-opacity-95">
+                        <div className="max-w-7xl mx-auto flex justify-between items-center px-4">
+                            <div className="text-white font-bold text-xl py-4 hidden md:block">
+                                Chemainus<span className="text-seafoam">+</span>District
+                            </div>
+                            <div className="flex overflow-x-auto no-scrollbar">
+                                <NavLink sectionId="research" label="Research" activeSection={activeSection} />
+                                <NavLink sectionId="content" label="Page Content" activeSection={activeSection} />
+                                <NavLink sectionId="proposal" label="Design Proposal" activeSection={activeSection} />
+                                <NavLink sectionId="preview" label="Live Preview" activeSection={activeSection} />
+                                <NavLink sectionId="bibliography" label="Bibliography" activeSection={activeSection} />
+                            </div>
+                        </div>
+                    </nav>
+
+                    {/* Hero Section */}
+                    <header id="hero" className="relative h-screen flex items-center justify-center bg-gray-900 text-white overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-teal-900 to-gray-900 opacity-90"></div>
+                        
+                        {/* Abstract Background Shapes */}
+                        <div className="absolute top-0 right-0 w-2/3 h-full bg-teal-800 opacity-20 transform -skew-x-12 translate-x-20"></div>
+                        <div className="absolute bottom-0 left-0 w-1/2 h-2/3 bg-seafoam opacity-10 rounded-full blur-3xl"></div>
+                        
+                        <div className="relative z-10 text-center max-w-4xl px-6">
+                            <h3 className="text-seafoam font-bold tracking-[0.2em] mb-4 text-lg">DESIGN PROPOSAL ASSIGNMENT</h3>
+                            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+                                Chemainus + District <br/>
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-seafoam to-gold">Chamber of Commerce</span>
+                            </h1>
+                            <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+                                A strategic vision for revitalizing the digital presence of "The Little Town That Did," integrating authentic heritage with economic resilience.
+                            </p>
+                            <div className="mt-12 flex justify-center gap-4">
+                                <button onClick={() => document.getElementById('research').scrollIntoView({behavior:'smooth'})} className="px-8 py-3 bg-teal hover:bg-seafoam text-white font-bold rounded-full transition-all shadow-lg hover:shadow-teal-500/50">
+                                    View Research
+                                </button>
+                                <button onClick={() => document.getElementById('proposal').scrollIntoView({behavior:'smooth'})} className="px-8 py-3 bg-transparent border-2 border-white text-white font-bold rounded-full hover:bg-white hover:text-teal-900 transition-all">
+                                    See Design
+                                </button>
+                            </div>
+                        </div>
+                    </header>
+
+                    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-32">
+                        
+                        {/* Research Summary Section */}
+                        <section id="research" className="pt-24">
+                            <SectionHeader title="Research Summary" subtitle="Context & Background" />
+                            
+                            <div className="grid md:grid-cols-12 gap-12">
+                                <div className="md:col-span-8 space-y-8">
+                                    <div className="text-gray-600 max-w-none text-lg">
+                                        <p className="lead text-2xl text-teal-800 font-bold mb-8 font-heading">
+                                            The Power of Public Art and Community Resilience: Chemainus's Economic Revitalization Model
+                                        </p>
+                                        <p className="mb-6">
+                                            Chemainus is a small resource-dependent logging town on Vancouver Island, British Columbia. It is one of North America's most intriguing stories of urban renewal through cultural innovation. Chemainus was originally settled in 1862 as a mill town built around Macmillan Bloedel's sawmill operation. In the early 1980s, Chemainus was in an economic crisis. In fact, when the sawmill closed in 1983, resulting in the loss of jobs for 575 employees, Chemainus was faced with an either-or choice: accept its fate or reinvent itself <CitationLink id="ref-crocker">(Crocker, 1994)</CitationLink>.
+                                        </p>
+                                        <p className="mb-6">
+                                            Chemainus is derived from an Indigenous shaman and prophet named "Tsa-meeun-is," or "broken chest" in English <CitationLink id="ref-visit">(Visit Chemainus, n.d.)</CitationLink>. According to tradition, Tsa-meeun-is was struck by a massive chest wound inflicted on him in battle but miraculously recovered. He became a great chief and served for several prosperous years <CitationLink id="ref-visit">(Visit Chemainus, n.d.)</CitationLink>. His people, the Stz'uminus First Nations, named their own people after their great chief <CitationLink id="ref-visit">(Visit Chemainus, n.d.)</CitationLink>.
+                                        </p>
+                                        <p className="mb-6">
+                                            Instead, deindustrialization was countered by an innovative approach by the Chemainus Downtown Revitalization Committee, led by Mayor Graham Bruce and coordinator Karl Shutz. A series of five large-scale murals, created before deindustrialization, depict Chemainus' history as a logging town and its settlement history. The public art campaign, named "Festival of Murals," initiated in 1982, long before deindustrialization, became a global phenomenon. An award by the Downtown Development Association in New York in 1983 propelled Chemainus, a small town, to global status, dubbed "The Little Town That Did," which tells a story of salvation through its murals <CitationLink id="ref-crocker">(Crocker, 1994)</CitationLink>.
+                                        </p>
+                                        <p className="mb-6">
+                                            Evidence supporting the economic benefits of public art involvement in town renewal initiatives reveals that public art programs boost economic growth through increased pedestrian traffic, business recruitment, and tourism—especially for towns shifting from a resource-based to a service-based industry. The case for Chemainus supports current research that indicates towns that invest in public art programs experience increased tourism revenue. For instance, Chemainus, which was previously a single-industry town, had by 1994 become a "hybrid model" combining resource-based and tourism-based industry. The town boasts over 100 businesses and hosts over 100,000 tourists annually. The North Cowichan Town Centre Revitalization Plan <CitationLink id="ref-north">(2011)</CitationLink> indicates that Chemainus was "Canada's largest outdoor gallery" with 44+ murals. The town had become stable due to increased tourism revenue.
+                                        </p>
+                                        <p className="mb-6">
+                                            The Chamber of Commerce plays an intermediary role in facilitating this hybrid economic system. Unlike other traditional Chambers of Commerce, which primarily serve as B2B marketing advocacy groups, Chemainus Chamber of Commerce serves two different audience groups. The first is B2B groups interested in business networking and operations support. The second is B2C groups comprising visitors and tourists interested in cultural activities. Literature on Chamber marketing effectiveness recognizes four types of Chamber members. These include entrepreneurs and start-up groups, transaction-oriented existing businesses, civic investor groups with community-oriented values, and pro-business groups <CitationLink id="ref-izzy">(Izzy West, 2022)</CitationLink>. The success of Chemainus Chamber of Commerce is an excellent example of how Chambers of Commerce play an integrating role in bundling different stakeholders' interests, ranging from merchants, cultural attractions, tourism-related services, galleries, and restaurants.
+                                        </p>
+                                        <p className="mb-6">
+                                            The case of Chemainus proves that public art and cultural projects are not simply luxury items, but rather essential economic motors for rural and post-industrial regions. The sustainability of this approach is, of course, dependent upon innovation, genuine community participation, and marketing positioning that takes into account heritage and contemporary creativity. For the Chemainus + District Chamber of Commerce, this study proves that the significance of developing a narrative that is focused on celebrating the authentic heritage of the Chemainus region, including our logging heritage, cultural diversity, and community resiliency, while at the same time positioning the region as a contemporary, culturally exciting, and business-friendly tourism destination, is critical to our future economic development.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="md:col-span-4 space-y-6">
+                                    <div className="bg-teal-50 p-6 rounded-lg border border-teal-100 sticky top-32 shadow-lg">
+                                        <h4 className="text-teal-800 font-bold mb-4 uppercase text-sm tracking-wider">Key Insights</h4>
+                                        <ul className="space-y-4">
+                                            <li className="flex gap-3">
+                                                <span className="text-2xl">🌲</span>
+                                                <span className="text-sm text-gray-700 font-medium">Transitioned from resource-dependent to hybrid tourism economy.</span>
+                                            </li>
+                                            <li className="flex gap-3">
+                                                <span className="text-2xl">🎨</span>
+                                                <span className="text-sm text-gray-700 font-medium">Public art as an economic engine, not just decoration.</span>
+                                            </li>
+                                            <li className="flex gap-3">
+                                                <span className="text-2xl">🤝</span>
+                                                <span className="text-sm text-gray-700 font-medium">Chamber connects B2B (business support) and B2C (tourism marketing).</span>
+                                            </li>
+                                            <li className="flex gap-3">
+                                                <span className="text-2xl">📈</span>
+                                                <span className="text-sm text-gray-700 font-medium">Hosts over 100,000 tourists annually with 44+ murals.</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Page Content Section */}
+                        <section id="content" className="pt-24 relative">
+                            <SectionHeader title="About Us Page Content" subtitle="Proposed Copy" />
+                            
+                            <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200">
+                                <div className="bg-teal-900 text-white p-4 text-xs font-mono flex justify-between items-center">
+                                    <span>COPY DRAFT V1.0</span>
+                                    <span>CHEMAINUS CHAMBER OF COMMERCE</span>
+                                </div>
+                                <div className="p-8 md:p-16 space-y-12">
+                                    
+                                    <StrategyNote title="Narrative Structure Strategy">
+                                        We utilize the <strong>"Hero's Journey"</strong> storytelling framework (Crisis → Guide → Transformation). Marketing psychology shows that narrative-driven brand stories create 22x more engagement than facts alone. By framing the 1983 crisis as the 'Call to Adventure,' we establish an emotional hook that resonates with modern values of resilience and authenticity.
+                                    </StrategyNote>
+
+                                    {/* Story Section */}
+                                    <div className="md:flex gap-12">
+                                        <div className="md:w-1/3">
+                                            <h3 className="text-2xl font-bold text-teal mb-4">Our Story</h3>
+                                            <div className="h-1 w-20 bg-seafoam mb-4"></div>
+                                            <p className="text-gray-500 italic">From Economic Crisis to Cultural Renaissance</p>
+                                        </div>
+                                        <div className="md:w-2/3 space-y-8 text-gray-700 leading-relaxed">
+                                            <div>
+                                                <h4 className="font-bold text-gray-900 mb-2">The Founding Era</h4>
+                                                <p>The history of our town starts with the establishment of our town's lumber mill way back in 1862. This would prove to be the defining moment for our town for the better part of the next one hundred years or so. People came to our town with the hope of building their lives within the industry. Some came from all over British Columbia, Canada, and the world. Among the prominent groups that came to our town include the Chinese and the Japanese. These groups formed the foundation upon which our town would be built. Our town would thus be a single-industry town with our identities deeply rooted within the forest and the lumber industry.</p>
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-gray-900 mb-2">The Turning Point: 1983</h4>
+                                                <p>The sawmill closed its doors in 1983. What was initially perceived as an economic worry had now become an actual crisis. There was an immediate loss of jobs for 575 workers, business failures, and an uncertain future for us. There was an air of fear that Chemainus would become just another ghost town, an example of an economy that was left behind because of changes in the world economy.</p>
+                                                <div className="my-6 p-6 bg-teal-50 border-l-4 border-gold rounded-r-lg italic text-gray-800 font-medium">
+                                                    "But Chemainus residents refused this narrative. Led by Mayor Graham Bruce and community coordinator Karl Shutz, local leaders asked a radical question: What if we could revitalize our town by celebrating and visualizing our authentic history through public art?"
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-gray-900 mb-2">The Mural Initiative: 1982 Onward</h4>
+                                                <p>Beginning in 1982, five large murals appeared on the downtown walls, each of them carrying its own piece of our history: logging camps, first settlers, railway bringing us access to the world beyond our mountains, and our rich cultural enclaves that worked their magic with sweat and hard labor. Yet all of them carried a piece of our history. More murals followed suit, and now we boast of 44+ massive works of art that morph us into Canada’s largest outdoor gallery.</p>
+                                                <p className="mt-4">In the year that succeeded that challenge, that is, in 1983, Chemainus received its reward when it was awarded the Downtown Development Association award in New York. It is at that point that the phrase “The Little Town That Did” was derived because of the positive values that Chemainus predominantly showcased. It is through that that Tourism was derived, hence providing us with an improved economy.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr className="border-gray-200" />
+
+                                    {/* Who We Are */}
+                                    <div className="md:flex gap-12">
+                                        <div className="md:w-1/3">
+                                            <h3 className="text-2xl font-bold text-teal mb-4">Who We Are Today</h3>
+                                            <div className="h-1 w-20 bg-seafoam mb-4"></div>
+                                        </div>
+                                        <div className="md:w-2/3 space-y-6">
+                                            <p className="text-gray-700">At the heart of the change are the Chemainus + District Chamber of Commerce, the impetus for the change. We are the bridge joining the fundamental elements comprised of the following:</p>
+                                            <div className="grid sm:grid-cols-2 gap-6">
+                                                <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
+                                                    <h5 className="font-bold text-teal mb-2 flex items-center gap-2">
+                                                        <span>💼</span> Local Businesses
+                                                    </h5>
+                                                    <p className="text-sm text-gray-600">More than 300 member organizations, retail, dining, art galleries, and progressive thinking ventures. Opportunities for networking, lobbying, and support.</p>
+                                                </div>
+                                                <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
+                                                    <h5 className="font-bold text-teal mb-2 flex items-center gap-2">
+                                                        <span>🗺️</span> Visitors & Culture
+                                                    </h5>
+                                                    <p className="text-sm text-gray-600">Over 400,000 visit every year to enjoy murals, professional theatre, top dining, and thriving artisan spaces, stimulating growth.</p>
+                                                </div>
+                                                <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 hover:shadow-md transition-shadow sm:col-span-2">
+                                                    <h5 className="font-bold text-teal mb-2 flex items-center gap-2">
+                                                        <span>🏡</span> Community & Residents
+                                                    </h5>
+                                                    <p className="text-sm text-gray-600">We promote an environment where people can live, work, and establish families within Chemainus. We are advocates for institutions, cultural activities, education, and other aspects that add flavor and texture to where we call home.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr className="border-gray-200" />
+
+                                    {/* Mission & Values */}
+                                    <div className="space-y-8">
+                                        <div className="text-center max-w-2xl mx-auto">
+                                            <h3 className="text-2xl font-bold text-teal">Our Mission</h3>
+                                            <p className="text-xl text-gray-700 mt-4 font-medium">We have always had the vision to build a vibrant community that encompasses both culture and commerce, as it relates to art, trade, and our strong heritage.</p>
+                                        </div>
+
+                                        <div>
+                                            <h4 className="text-xl font-bold text-gray-900 mb-6 text-center">Our Core Values</h4>
+                                            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                                {[
+                                                    {t:'Authenticity', icon:'🏛️', d:'We celebrate our genuine heritage: our logging past, our multicultural heritage. We reject phony nostalgia; we celebrate genuine culture.'},
+                                                    {t:'Economic Resilience', icon:'📈', d:'By investing in individual businesses and boosting tourism, we develop economies that are resistant to economic fluctuations.'},
+                                                    {t:'Creative Expression', icon:'🎨', d:'Our public art is not just decorative – our art is an essential part of our identity. We are enriched by our art.'},
+                                                    {t:'Inclusive Community', icon:'🤝', d:'We celebrate the makers of Chemainus, from First Nations to immigrants. Everyone belongs in today\'s Chemainus.'},
+                                                    {t:'Collaborative Problem Solving', icon:'🧩', d:'We believe lasting change occurs when diverse perspectives are fully engaged. We combine business, art, and culture.'}
+                                                ].map((v,i) => (
+                                                    <div key={i} className="p-6 border border-teal-100 rounded-xl hover:bg-teal-50 transition-colors">
+                                                        <div className="text-3xl mb-3">{v.icon}</div>
+                                                        <h5 className="font-bold text-teal mb-2">{v.t}</h5>
+                                                        <p className="text-sm text-gray-600">{v.d}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr className="border-gray-200" />
+
+                                    {/* USPs */}
+                                    <div>
+                                        <h3 className="text-2xl font-bold text-teal mb-6">Unique Selling Propositions (USPs)</h3>
+                                        <ul className="space-y-4">
+                                            {[
+                                                {t: "Canada's Largest Outdoor Gallery", d: "44+ monumental murals depicting authentic community history attraction visitors globally."},
+                                                {t: "Proven Economic Revitalization Model", d: "Chemainus demonstrates how cultural initiatives transform resource-dependent communities."},
+                                                {t: "Authentic Heritage", d: "Unlike theme-park approximations, Chemainus preserves genuine logging and immigrant history."},
+                                                {t: "Integrated Arts Ecosystem", d: "Murals, theatre festival, artisan galleries, and music venues create a comprehensive experience."},
+                                                {t: "Strategic Tourism Location", d: "Easy access from Nanaimo, Duncan, and ferry terminals captures multi-day visitor markets."}
+                                            ].map((usp, i) => (
+                                                <li key={i} className="flex gap-4">
+                                                    <span className="text-teal font-bold pt-1">✓</span>
+                                                    <div>
+                                                        <strong className="text-gray-900">{usp.t}:</strong> <span className="text-gray-600">{usp.d}</span>
+                                                    </div>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Design Proposal Section */}
+                        <section id="proposal" className="pt-24">
+                            <SectionHeader title="Design Proposal" subtitle="Visual Structure & Specs" />
+                            
+                            <div className="space-y-16">
+                                
+                                {/* 1. Layout Description */}
+                                <div>
+                                    <h3 className="text-2xl font-bold text-gray-800 mb-8 border-b pb-4">1. Layout Description & Visual Structure</h3>
+                                    <div className="grid md:grid-cols-2 gap-8">
+                                        <Card title="Hero Section (Cinematic Entrance)">
+                                            <ul className="space-y-3">
+                                                <li><strong>Visual:</strong> Full-viewport height, parallax video/image of murals in golden hour.</li>
+                                                <li><strong>Overlay:</strong> Deep teal to black gradient (55% opacity).</li>
+                                                <li><strong>Typography:</strong> H1 "The Little Town That Did" (48-64px Montserrat Bold).</li>
+                                                <li><strong>Primary CTA:</strong> "Explore Our Story" (Teal pill, #008080).</li>
+                                                <li><strong>Nav:</strong> Fixed, semi-transparent.</li>
+                                            </ul>
+                                            <div className="mt-4 pt-4 border-t border-gray-100 text-xs text-indigo-800 bg-indigo-50 p-2 rounded">
+                                                <strong>Why Video Hero?</strong> Movement grabs attention immediately. "Show, don't tell" reduces bounce rate by 15-20% in tourism sectors.
+                                            </div>
+                                        </Card>
+                                        <Card title="Introduction (Two-Column)">
+                                            <ul className="space-y-3">
+                                                <li><strong>Layout:</strong> Split grid. Left: Narrative text. Right: Framed specific mural image.</li>
+                                                <li><strong>Interaction:</strong> Fade-in on scroll. Hover on image = scale 1.03x.</li>
+                                                <li><strong>Styling:</strong> Seafoam divider line (60px). Justified body text.</li>
+                                            </ul>
+                                            <div className="mt-4 pt-4 border-t border-gray-100 text-xs text-indigo-800 bg-indigo-50 p-2 rounded">
+                                                <strong>Why Split Grid?</strong> Increases readability by breaking text into scannable chunks (F-Pattern), reducing cognitive load.
+                                            </div>
+                                        </Card>
+                                        <Card title="Timeline (Vertical Heritage)">
+                                            <ul className="space-y-3">
+                                                <li><strong>Concept:</strong> "A Decade of Change". Vertical line (seafoam 2px).</li>
+                                                <li><strong>Flow:</strong> Staggered L/R items (1970s, 1982, 1983, 1990s).</li>
+                                                <li><strong>Markers:</strong> Teal circles with seafoam glow.</li>
+                                                <li><strong>Background:</strong> Light Gray (#f4f7f6).</li>
+                                            </ul>
+                                            <div className="mt-4 pt-4 border-t border-gray-100 text-xs text-indigo-800 bg-indigo-50 p-2 rounded">
+                                                <strong>Why Scrollytelling?</strong> Animated timelines keep users scrolling. Interaction cost is low while information density is high.
+                                            </div>
+                                        </Card>
+                                        <Card title="Mission & Values (Glassmorphism)">
+                                            <ul className="space-y-3">
+                                                <li><strong>Theme:</strong> Dark gradient (#1a2930 to #004d4d).</li>
+                                                <li><strong>Effect:</strong> Glassmorphism cards (rgba(255,255,255,0.1), blur 10px).</li>
+                                                <li><strong>Layout:</strong> Mission card spans full; 5 value cards with icons.</li>
+                                                <li><strong>Texture:</strong> Subtle geometric SVG pattern.</li>
+                                            </ul>
+                                            <div className="mt-4 pt-4 border-t border-gray-100 text-xs text-indigo-800 bg-indigo-50 p-2 rounded">
+                                                <strong>Why Glassmorphism?</strong> A premium 2025/26 trend that suggests transparency and modernity. It separates content from background without harsh borders.
+                                            </div>
+                                        </Card>
+                                        <Card title="Markets (Dual Focus)">
+                                            <ul className="space-y-3">
+                                                <li><strong>Split Layout:</strong> B2B vs B2C.</li>
+                                                <li><strong>B2B (Left):</strong> Light gray. "Become a Member". Business Icon.</li>
+                                                <li><strong>B2C (Right):</strong> Deep Teal. "Plan Your Visit". Visitor Icon.</li>
+                                                <li><strong>Goal:</strong> Clearly segment audience paths.</li>
+                                            </ul>
+                                        </Card>
+                                        <Card title="Footer (Dark Theme)">
+                                            <div className="text-xs">
+                                                <p className="mb-2"><strong>Background:</strong> #0f1c22</p>
+                                                <p className="mb-2"><strong>Cols:</strong> Info | Quick Links | Newsletter/Social.</p>
+                                                <p><strong>Detail:</strong> Seafoam hover effects on links. Social icons brighten on hover.</p>
+                                            </div>
+                                        </Card>
+                                    </div>
+                                </div>
+
+                                {/* 2. CTA Strategy */}
+                                <div>
+                                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b pb-4 gap-4">
+                                        <h3 className="text-2xl font-bold text-gray-800">2. Strategic CTA Hierarchy</h3>
+                                        <StrategyNote>
+                                            <strong>Conversion Optimization:</strong> We use the "Hick's Law" principle—reducing choices to 3 clear tiers prevents decision paralysis. The visual weight (Solid vs Outline vs Text) matches the business value of the key action.
+                                        </StrategyNote>
+                                    </div>
+                                    <div className="grid md:grid-cols-3 gap-6">
+                                        <div className="bg-white border-t-8 border-teal rounded-xl shadow-lg p-6 relative overflow-hidden group">
+                                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                                <span className="text-6xl">1</span>
+                                            </div>
+                                            <h4 className="text-xl font-bold text-teal mb-2">Primary (Tier 1)</h4>
+                                            <div className="mb-4">
+                                                <button className="bg-teal text-white font-bold py-3 px-8 rounded-full shadow-lg transform group-hover:translate-y-[-2px] transition-transform w-full">
+                                                    Become a Member
+                                                </button>
+                                            </div>
+                                            <p className="text-sm font-semibold text-gray-700">Ref: #008080</p>
+                                            <p className="text-sm text-gray-500 mt-2">Target: Business & Stakeholders. High contrast, shadow.</p>
+                                        </div>
+
+                                        <div className="bg-white border-t-8 border-seafoam rounded-xl shadow-lg p-6 relative overflow-hidden group">
+                                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                                <span className="text-6xl">2</span>
+                                            </div>
+                                            <h4 className="text-xl font-bold text-teal mb-2">Secondary (Tier 2)</h4>
+                                            <div className="mb-4">
+                                                <button className="bg-white border-2 border-teal text-teal font-bold py-3 px-8 rounded-full transform group-hover:bg-teal group-hover:text-white transition-colors w-full">
+                                                    Plan Your Visit
+                                                </button>
+                                            </div>
+                                            <p className="text-sm font-semibold text-gray-700">Outline Style</p>
+                                            <p className="text-sm text-gray-500 mt-2">Target: Tourists. Ghost button style with hover fill.</p>
+                                        </div>
+
+                                        <div className="bg-white border-t-8 border-gold rounded-xl shadow-lg p-6 relative overflow-hidden group">
+                                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                                <span className="text-6xl">3</span>
+                                            </div>
+                                            <h4 className="text-xl font-bold text-teal mb-2">Tertiary (Tier 3)</h4>
+                                            <div className="mb-4">
+                                                <button className="text-teal font-bold py-3 px-8 rounded-full hover:bg-gray-50 transition-colors w-full flex items-center justify-center gap-2">
+                                                    Discover Events <span>→</span>
+                                                </button>
+                                            </div>
+                                            <p className="text-sm font-semibold text-gray-700">Text / Minimal</p>
+                                            <p className="text-sm text-gray-500 mt-2">Target: Community Engagement. Fear of Missing Out (FOMO).</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* 3. Design Specs */}
+                                <div>
+                                    <h3 className="text-2xl font-bold text-gray-800 mb-8 border-b pb-4">3. Design Specifications Selection</h3>
+                                    
+                                    <div className="grid md:grid-cols-3 gap-8 mb-8">
+                                        <div className="md:col-span-2">
+                                            <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                                                <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200">
+                                                    <div className="p-8 space-y-4">
+                                                        <h4 className="font-bold text-gray-900 mb-4 uppercase tracking-wider text-sm">Color System</h4>
+                                                        <SpecItem label="Primary Teal" value="#008080" />
+                                                        <SpecItem label="Seafoam Accent" value="#4db6ac" />
+                                                        <SpecItem label="Gold Accent" value="#ffd700" />
+                                                        <SpecItem label="Dark Bg" value="#0f1c22" />
+                                                        <SpecItem label="Light Bg" value="#f4f7f6" />
+                                                        <SpecItem label="Card Text" value="#2c3e50" />
+                                                    </div>
+                                                    <div className="p-8 space-y-4">
+                                                        <h4 className="font-bold text-gray-900 mb-4 uppercase tracking-wider text-sm">Typography & Spacing</h4>
+                                                        <SpecItem label="Headings" value="Montserrat (Bold 700)" />
+                                                        <SpecItem label="Body" value="Roboto (Regular 400)" />
+                                                        <SpecItem label="Button Radius" value="50px (Pill)" />
+                                                        <SpecItem label="Card Shadow" value="0 10px 30px rgba(0,0,0,0.1)" />
+                                                        <SpecItem label="Section Padding" value="5rem" />
+                                                        <SpecItem label="Touch Targets" value="≥ 44px" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-4">
+                                            <StrategyNote title="Typography Psychology">
+                                                <strong>Montserrat</strong> (Geometric Sans) projects stability and authority (Government/Chamber). <strong>Roboto</strong> (Humanist Sans) is optimized for screen readability. This pairing facilitates information retention.
+                                            </StrategyNote>
+                                            <StrategyNote title="Color Psychology">
+                                                <strong>Teal & Seafoam</strong> evoke growth, revitalization, and nature—aligning with the "New Beginning" story. <strong>Gold</strong> is used sparingly as an accent for "Value" and "Heritage."
+                                            </StrategyNote>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {/* 4. Image Strategy */}
+                                <div>
+                                    <h3 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-4">4. Image & Content Strategy</h3>
+                                    <div className="grid md:grid-cols-2 gap-8">
+                                        <div>
+                                            <h4 className="font-bold text-teal mb-4">Photography Guidelines</h4>
+                                            <ul className="list-disc pl-5 space-y-2 text-gray-600 text-sm">
+                                                <li><strong>Authenticity First:</strong> Use real photos of murals, local businesses, and residents. No stock generic city shots.</li>
+                                                <li><strong>Golden Hour:</strong> Hero shots should be warm, late afternoon light.</li>
+                                                <li><strong>Human Element:</strong> Show people interacting with the art, not just empty streets.</li>
+                                                <li><strong>Composition:</strong> Wide establishing shots for headers; tight detail shots for cards.</li>
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-teal mb-4">Iconography</h4>
+                                            <ul className="list-disc pl-5 space-y-2 text-gray-600 text-sm">
+                                                <li><strong>Style:</strong> Simple line or duotone icons.</li>
+                                                <li><strong>Color:</strong> Seafoam (#4db6ac) primary fill or stroke.</li>
+                                                <li><strong>Metaphors:</strong> Handshake (Business), Map (Tourism), Palette (Art), Gears (Resilience).</li>
+                                                <li><strong>Size:</strong> 2.5rem - 3rem for accessibility and visual impact.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </section>
+
+                        {/* Live Preview Section */}
+                        <section id="preview" className="pt-24">
+                            <SectionHeader title="Live Prototype" subtitle="Interactive Demo" />
+                            
+                            <div className="bg-gray-900 rounded-xl shadow-2xl overflow-hidden border border-gray-800 relative group">
+                                <div className="absolute top-0 left-0 right-0 h-12 bg-gray-800 flex items-center px-4 space-x-2 border-b border-gray-700 z-10">
+                                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                                    <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                                    <div className="flex-1 text-center text-xs text-gray-400 font-mono hidden sm:block">
+                                        https://beckettevans.github.io/AboutUSCMNS175/about%20us.html
+                                    </div>
+                                    <a 
+                                        href="https://beckettevans.github.io/AboutUSCMNS175/about%20us.html" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="bg-teal hover:bg-seafoam text-white text-xs font-bold py-1.5 px-3 rounded transition-colors shadow-lg flex items-center gap-2"
+                                    >
+                                        <span>Open Full Screen</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                        </svg>
+                                    </a>
+                                </div>
+                                
+                                <div className="h-[800px] w-full pt-12 relative bg-white">
+                                    {isPreviewLoading && (
+                                        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-gray-900 text-white pt-12">
+                                            <div className="w-16 h-16 border-4 border-teal-800 border-t-seafoam rounded-full animate-spin mb-6"></div>
+                                            <h3 className="text-xl font-bold font-montserrat tracking-widest mb-2">CONNECTING...</h3>
+                                            <p className="text-gray-400 text-sm mb-4">Waiting for Hero Video to Start...</p>
+                                            
+                                            <p className="text-gray-500 text-xs mt-4 max-w-md text-center animate-pulse">
+                                                Syncing playback status from live feed...
+                                            </p>
+                                            
+                                            <button 
+                                                onClick={() => setIsPreviewLoading(false)}
+                                                className="mt-8 px-4 py-2 bg-gray-800 border border-gray-700 rounded text-xs text-gray-400 hover:text-white hover:border-gray-500 transition-colors"
+                                            >
+                                                Force Reveal Preview
+                                            </button>
+                                        </div>
+                                    )}
+                                    <iframe 
+                                        src="https://beckettevans.github.io/AboutUSCMNS175/about%20us.html" 
+                                        className={`w-full h-full border-0 transition-opacity duration-1000 ${isPreviewLoading ? 'opacity-0' : 'opacity-100'}`}
+                                        title="Live Website Preview"
+                                        loading="lazy"
+                                    ></iframe>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Bibliography Section */}
+                        <section id="bibliography" className="pt-24 pb-24">
+                            <SectionHeader title="Works Cited" subtitle="References" />
+                            
+                            <div className="bg-white p-8 md:p-12 rounded-xl shadow-sm border-l-4 border-gray-300">
+                                <ul className="space-y-6 text-gray-600 break-words text-sm md:text-base" style={{ paddingLeft: '2em', textIndent: '-2em' }}>
+                                    <li>American Psychological Association. (2024, December 31). <em>Webpage on a website references - APA Style</em>. Retrieved January 21, 2026, from <a href="https://apastyle.apa.org/style-grammar-guidelines/references/examples/webpage-website-references" className="text-teal-600 hover:underline">https://apastyle.apa.org...</a></li>
+                                    
+                                    <li>Capilano University. (2020, March 22). <em>APA Citation Guide (7th edition): Websites</em>. LibGuides. Retrieved January 21, 2026, from <a href="https://libguides.capilanou.ca/apa/websites" className="text-teal-600 hover:underline">https://libguides.capilanou.ca/apa/websites</a></li>
+                                    
+                                    <li>Codazine. (2025, April 3). <em>9 ways small towns are transforming through public art</em>. Knowledge. Retrieved January 21, 2026, from <a href="https://knowledge.codaworx.com/codazine/creativity-on-a-budget-9-ways-small-towns-are-transforming-through-public-art" className="text-teal-600 hover:underline">https://knowledge.codaworx.com...</a></li>
+                                    
+                                    <li id="ref-crocker">Crocker, G. L. (1994). <em>A tourist directed simulation: Chemainus, B.C.</em> [Master's thesis, Simon Fraser University]. SFU Summit Repository. <a href="https://summit.sfu.ca/item/6611" className="text-teal-600 hover:underline">https://summit.sfu.ca/item/6611</a></li>
+                                    
+                                    <li id="ref-izzy">Izzy West. (2022, September 26). <em>How to plan your chamber's target audience for effective membership marketing</em>. Retrieved January 21, 2026, from <a href="https://theizzywest.com/chambers-target-audience-membership-marketing/" className="text-teal-600 hover:underline">https://theizzywest.com...</a></li>
+                                    
+                                    <li>Momentum for Business Growth. (2021, June 16). <em>Your target market? The Chamber of Commerce already has it built for you</em>. Retrieved January 21, 2026, from <a href="https://www.momentumforbusinessgrowth.com/chamber-of-commerce-target-market/" className="text-teal-600 hover:underline">https://www.momentumforbusinessgrowth.com...</a></li>
+                                    
+                                    <li>Muraltown. (n.d.). <em>History and art hand in hand with business</em>. Retrieved January 21, 2026, from <a href="https://muraltown.com/supporting-the-organization/history-art-hand-hand-business" className="text-teal-600 hover:underline">https://muraltown.com...</a></li>
+                                    
+                                    <li id="ref-north">North Cowichan. (2011, Fall). <em>Chemainus Town Centre Revitalization Plan</em>. Retrieved January 21, 2026, from <a href="https://www.northcowichan.ca/sites/default/files/2023-10/Chemainus%20Revitalization.pdf" className="text-teal-600 hover:underline">https://www.northcowichan.ca...</a></li>
+                                    
+                                    <li>Plank. (2024, May 16). <em>The ultimate web design RFP guide</em>. Retrieved January 21, 2026, from <a href="https://plank.co/en/blog/the-ultimate-web-design-rfp-guide/" className="text-teal-600 hover:underline">https://plank.co/en/blog...</a></li>
+                                    
+                                    <li>Wix Studio. (2024, September 30). <em>How to create a successful website design proposal</em>. Retrieved January 21, 2026, from <a href="https://www.wix.com/studio/blog/website-design-proposal" className="text-teal-600 hover:underline">https://www.wix.com/studio/blog...</a></li>
+                                    
+                                    <li id="ref-visit">Visit Chemainus. (n.d.). <em>History</em>. Retrieved January 21, 2026, from <a href="https://www.visitchemainus.ca/history" className="text-teal-600 hover:underline">https://www.visitchemainus.ca/history</a></li>
+                                </ul>
+                            </div>
+                        </section>
+
+                    </main>
+
+                    {/* Footer */}
+                    <footer className="bg-gray-900 text-white py-12 border-t border-gray-800">
+                        <div className="max-w-7xl mx-auto px-6 text-center">
+                            <h2 className="text-2xl font-bold mb-4 font-montserrat">Chemainus + District Chamber of Commerce</h2>
+                            <p className="text-gray-400 max-w-lg mx-auto mb-8">
+                                Design Proposal & Research Presentation
+                                <br/>Generated for Review
+                            </p>
+                            <p className="text-sm text-gray-500">© 2026 Chemainus + District Chamber of Commerce</p>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

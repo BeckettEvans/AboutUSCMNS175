@@ -540,5 +540,22 @@
     </footer>
 
     <script src="about-us.js"></script>
+    <script>
+      // PostMessage for Live Preview Embed
+      document.addEventListener("DOMContentLoaded", () => {
+        const heroVideo = document.querySelector('.video-bg');
+        if (heroVideo) {
+          heroVideo.addEventListener('playing', () => {
+             // Notify parent window that video is playing
+             window.parent.postMessage({ type: 'HERO_VIDEO_PLAYING' }, '*');
+          });
+          
+          // Fallback if already playing (e.g. cached)
+          if (heroVideo.currentTime > 0 && !heroVideo.paused && !heroVideo.ended && heroVideo.readyState > 2) {
+             window.parent.postMessage({ type: 'HERO_VIDEO_PLAYING' }, '*');
+          }
+        }
+      });
+    </script>
   </body>
 </html>
